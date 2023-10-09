@@ -1,0 +1,26 @@
+AT	&	Muvelteto igekepzo
+A	&	Nevelo
+AS	&	Regi romai apro
+LAC	&	Francia alloviz
+ET	&	foldonkivuli
+IF	&	Monte christo
+U	&	Uran vegyjele
+Q	&	Q
+CAEN	&	Francia telepules
+EBEN	&	Tropusi fafajta
+AYA	&	Szofia
+AC	&	Kanadai legitarsasag
+SALT	&	Lake city
+ENYH	&	Arnyekos hely
+EAR	&	Ful
+O	&	Oxigen
+AA	&	Elem
+ATA	&	telepules
+E	&	Ev eleje
+R	&	Ellenallas
+X	&	X
+CIBAK	&	Katonakenyer
+GA	&	Gallium
+NAL	&	nal
+CY	&	ciprus autojel
+FE	&	Ferrium
