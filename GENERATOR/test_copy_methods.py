@@ -17,20 +17,20 @@ def testCopyMethod(matrix, copyMethod):
     for i in range (3):
         copyMatrix = copy.deepcopy(matrix)
 
-        print(f"Iteration {i}: Before modifying the matrix:")
-        print("Original matrix:")
-        printMatrix(matrix)
-        print("Copy matrix:")
-        printMatrix(copyMatrix)
+        print(f"Memory adresses of matrix vals before modifying:\n{list(map(id, matrix))}")
+        print(f"Memory adresses of copy matrix vals before modifying:\n{list(map(id, copyMatrix))}")
+        print(f"Memory adress of matrix before modifying:\n{id(matrix)}")
+        print(f"Memory adress of copy matrix before modifying:\n{id(copyMatrix)}")
+        print()
 
         modifyMatrix(matrix, i)
-    
-        print(f"\n\nIteration {i}: After modifying the matrix:")
-        print("Original matrix:")
-        printMatrix(matrix)
-        print("Copy matrix:")
-        printMatrix(copyMatrix)
         
+        print(f"Memory adresses of matrix vals after modifying:\n{list(map(id, matrix))}")
+        print(f"Memory adresses of copy matrix vals after modifying:\n{list(map(id, copyMatrix))}")
+        print(f"Memory adress of matrix after modifying:\n{id(matrix)}")
+        print(f"Memory adress of copy matrix after modifying:\n{id(copyMatrix)}")
+        print()
+
         if recCond(matrix):
             return
         
@@ -47,19 +47,28 @@ def testCopyMethod(matrix, copyMethod):
             print("\nI that wierd chatgpt syntax")
             matrix[:] = copyMatrix
             
-        print(f"\n\nIteration {i}: After setting back the snapshot:")
-        print("Original matrix:")
-        printMatrix(matrix)
-        print("Copy matrix:")
-        printMatrix(copyMatrix)
-        print("-------------------------------------------")
+        print(f"Memory adresses of matrix vals after resetting:\n{list(map(id, matrix))}")
+        print(f"Memory adresses of copy matrix vals after resetting:\n{list(map(id, copyMatrix))}")
+        print(f"Memory adress of matrix after resetting:\n{id(matrix)}")
+        print(f"Memory adress of copy matrix after resetting:\n{id(copyMatrix)}")
+        print()
+        print()
+        print()
 
 initMatrix = [
                 [1, 2],
                 [3, 4]
             ]
 
+print("#####@@@@@@@@")
+print(f"Memory adress of initMatrix:\n{id(initMatrix)}")
+print(f"Memory adresses of initMatrix vals:\n{list(map(id, initMatrix))}")
+print("@@@@@########")
+print()
+
 testCopyMethod(initMatrix, 2)
 
 print("\n\nAt the end the init matrix:")
+print(f"Memory adress of initMatrix:\n{id(initMatrix)}")
+print(f"Memory adresses of initMatrix vals:\n{list(map(id, initMatrix))}")
 printMatrix(initMatrix)
