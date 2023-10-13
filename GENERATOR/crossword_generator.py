@@ -6,17 +6,13 @@ def importWordsFromFile(inputFile):
 
     output = []
     for line in lines:
-        #print(line.split("&")[1])
         tmpLine = line.split("&")
         tmpLine[0] = tmpLine[0].rstrip()
         tmpLine[0] = tmpLine[0].lstrip()
         tmpLine[1] = tmpLine[1].rstrip()
         tmpLine[1] = tmpLine[1].lstrip()
-        #print(tmpLine)
         output.append(tmpLine)
 
-    #for newLine in output:
-        #print(f"The word is: {newLine[0]} \tAnd the question is: {(newLine[1])}")
     return output
 
 def bubbleSortWordLength(listOfWords):
@@ -26,9 +22,6 @@ def bubbleSortWordLength(listOfWords):
         for j in range(0, n-i-1):
             if len(listOfWords[j][0]) < len(listOfWords[j+1][0]):
                 listOfWords[j], listOfWords[j+1] = listOfWords[j+1], listOfWords[j]
-
-    #for newLine in listOfWords:
-        #print(f"The word is: {newLine[0]} \tAnd the question is: {(newLine[1])}")
 
 def possiblePositions(currentWord, grid):
     listOfPossibleCoordinates = []
@@ -50,10 +43,6 @@ def possiblePositions(currentWord, grid):
                 tmpList = [row, col, "down"]
                 listOfPossibleCoordinates.append(tmpList)
 
-##    print(f"{currentWord} has the following possible positions:")
-##    for coords in listOfPossibleCoordinates:
-##        print(f"X = {coords[0]} Y = {coords[1]} directions = {coords[2]}")
-
     return listOfPossibleCoordinates
 
 def fits(currentWord, position, grid, questions):
@@ -70,7 +59,6 @@ def fits(currentWord, position, grid, questions):
             return False
         else:
             for i in range(wordLength):
-                #print(f"row = {row}, col = {col}, i = {i}, WL = {wordLength}, word = {currentWord}")
                 if grid[row][col + i] != "." and grid[row][col + i] != currentWord[i]:
                     return False
             if col + wordLength < len(grid[0]):
@@ -220,21 +208,11 @@ def crossword(words, grid, questions, staticWords):
                     print("The snapshot grid which will be the new grid:")
                     printGame(gridSnapshot, {})
                     print("--------------------\n")
-                
-                ##not working:
-                #grid = copy.deepcopy(gridSnapshot)
-                #questions = copy.deepcopy(questionsSnapshot)
-                #working:
-##                grid[:] = gridSnapshot
-##                questions.clear()
-##                questions.update(questionsSnapshot)
-                #not working:
-##                grid = copy.copy(gridSnapshot)
-##                questions = copy.copy(questionsSnapshot)
-                #not working:
-                # check this later: https://www.educba.com/copy-list-in-python/                    
-                grid = gridSnapshot
-                questions = questionsSnapshot
+                    
+                grid[:] = gridSnapshot
+                questions.clear()
+                questions.update(questionsSnapshot)
+
                 
                 
                 if currentWord == "AYA" or currentWord == "LAC":
