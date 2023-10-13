@@ -169,57 +169,30 @@ def crossword(words, grid, questions, staticWords):
         print("All fields are full")
         if isGridLegit(grid, staticWords, questions):
             return True
+        else:
+            return False
 
     if not words:
         return False
 
     currentWordPair = words.pop(0)
     currentWord = currentWordPair[0]
-    #print(currentWord)
-    for pos in possiblePositions(currentWord, grid):
-##        if currentWord == "SALT":
-##            print(f"I am SALT, my next position is: x= {pos[0]}, y = {pos[1]}, dir = {pos[2]}") 
-        #print(f"I am here because of {currentWord}")
+    for pos in possiblePositions(currentWord, grid): 
         if fits(currentWord, pos, grid, questions):
-##            if currentWord == "SALT":
-##                print(f"I am SALT, and I fit in: x= {pos[0]}, y = {pos[1]}, dir = {pos[2]}")
-            if currentWord == "AYA" or currentWord == "LAC":
-                print(f"The current grid at the beggining of the iteration of: {currentWord}")
-                printGame(grid, {})
-
+            #Making deepcopy snapshots for the backtracking
             gridSnapshot = copy.deepcopy(grid)
             questionsSnapshot = copy.deepcopy(questions)
             
             placeWord(currentWordPair, pos, grid, questions)
             if crossword(words, grid, questions, staticWords):
-                if currentWord == "AYA" or currentWord == "LAC": 
-                    print(f"I am done, returning from {currentWord} The grid:")
-                    printGame(grid, questions)
-                    print("The snapshot grid:")
-                    printGame(gridSnapshot, {})
-                    print("--------------------\n")
                 return True
             else:
-                if currentWord == "AYA" or currentWord == "LAC":
-                    print(f"I state back the grid at {currentWord}.")
-                    print("The current grid which will be set back:")
-                    printGame(grid, {})
-                    print("The snapshot grid which will be the new grid:")
-                    printGame(gridSnapshot, {})
-                    print("--------------------\n")
-                    
+                #Restoring the grid, since prev position did not lead to a solution   
                 grid[:] = gridSnapshot
                 questions.clear()
                 questions.update(questionsSnapshot)
 
-                
-                
-                if currentWord == "AYA" or currentWord == "LAC":
-                    print("The stated back grid:")
-                    printGame(grid, {})
-                    print("--------------------")
-                    print("--------------------\n")
-
+    #lets put back current word, beacuse we are going up one level
     words.insert(0, currentWordPair)
     return False
 
@@ -228,11 +201,11 @@ def printGame(grid, questions):
     tmpRow = ""
     for row in range(len(grid)):
         for col in range(len(grid[0])):
-            #tmpRow.append(str(grid[row][col]))
             tmpRow += str(grid[row][col]) + "\t"
         print(tmpRow)
         tmpRow = ""
-
+    
+    print("\nQuestions:")
     for key, value in questions.items():
         print(f"{key}: {value}") 
     
@@ -242,7 +215,6 @@ def countEmptyFields(grid):
         for col in range(len(grid[0])):
             if grid[row][col] == ".":
                 emptyFields += 1
-##    print(f"We found {emptyFields} empty field")
     return emptyFields
 
 def main():
@@ -273,20 +245,9 @@ def main():
     dynamicWords = importWordsFromFile("input.txt")
     bubbleSortWordLength(dynamicWords)
 
+    #Is used later to check if all words on the grid exists in the input list
     staticWords = copy.deepcopy(dynamicWords)
-##    for pos in possiblePositions(words[0][0], grid):
-##        if fits(words[0][0], pos, grid, questions):
-##            placeWord(words[0], pos, grid, questions)
-##            break
-##    position=[7, 1, "across"]
-##    print(isGridWordLegit(position, grid, words, questions))
-
-##    print(fits("SALT", [1, 5, "down"], grid, questions))
-##    placeWord(["SALT", "so"], [1, 5, "down"], grid, questions)
-##    print(fits("ET", [4, 4, "across"], grid, questions))
-##    placeWord(["ET", "et"], [4, 4, "across"], grid, questions)
     
-
     print(crossword(dynamicWords, grid, questions, staticWords))
     printGame(grid, questions)
 
