@@ -51,6 +51,7 @@ def fits(currentWord, position, grid, questions):
 
     if direction == "across":
         if ( (grid[row][col-1] != ".") and (grid[row][col-1] not in questions) ):
+            #If there is no place for the question before the word we return false
             return False
         else:
             for i in range(wordLength):
@@ -58,22 +59,19 @@ def fits(currentWord, position, grid, questions):
                     return False
             if col + wordLength < len(grid[0]):
                 if (grid[row][col+wordLength] != ".") and (grid[row][col+wordLength] not in questions):
+                    #The word cannot end into another word, it has to be the border or a question box
                     return False
     else:
         if ( (grid[row-1][col] != ".") and (grid[row-1][col] not in questions) ):
-##            if currentWord == "SALT":
-##                print(f"I am SALT and pos {row},{col} {direction} is not good, because no place for questions") 
+            #If there is no place for the question before the word we return false
             return False
         else:
             for i in range(wordLength):
                 if grid[row + i][col] != "." and grid[row + i][col] != currentWord[i]:
-##                    if currentWord == "SALT":
-##                        print(f"I am SALT and pos {row},{col} {direction} is not good, because {grid[row + i][col]} does not fit for the word")
                     return False
             if row + wordLength < len(grid):
                 if (grid[row+wordLength][col] != ".") and (grid[row+wordLength][col] not in questions):
-##                    if currentWord == "SALT":
-##                        print(f"I am SALT and pos {row},{col} {direction} is not good, because the end of the word would be {grid[row+wordLength][col]}")
+                    #The word cannot end into another word, it has to be the border or a question box
                     return False
 
     return True;
@@ -81,7 +79,9 @@ def fits(currentWord, position, grid, questions):
 def placeWord(currentWordAndQuestion, position, grid, questions):
     currentWord = currentWordAndQuestion[0]
     currentQuestion = currentWordAndQuestion[1]
+    
     wordLength = len(currentWord)
+    
     row = position[0]
     col = position[1]
     direction = position[2]
@@ -90,27 +90,35 @@ def placeWord(currentWordAndQuestion, position, grid, questions):
         for i in range(wordLength):
             grid[row][col + i] = currentWord[i]
         if grid[row][col - 1] == ".":
+            #we have to create a new question box
             if not questions:
+                #if there is no question dict we have to make it
                 questions[1] = direction + ": " + currentQuestion
                 grid[row][col - 1] = 1
             else:
                 questions[max(questions)+1] = direction + ": " + currentQuestion
                 grid[row][col - 1] = max(questions)
         else:
+            #we extend the existing question box
             questions[grid[row][col - 1]] += "\t" + direction + ": " + currentQuestion
     else:
         for i in range(wordLength):
             grid[row + i][col] = currentWord[i]
         if grid[row - 1][col] == ".":
+            #we have to create a new question box
             if not questions:
+                #if there is no question dict we have to make it
                 questions[1] = direction + ": " + currentQuestion
                 grid[row - 1][col] = 1
             else:
                 questions[max(questions)+1] = direction + ": " + currentQuestion
                 grid[row - 1][col] = max(questions)
         else:
+            #we extend the existing question box
             questions[grid[row - 1][col]] += "\t" + direction + ": " + currentQuestion
 
+#Checks that a word which is already on the grid is truly in the list of words
+#TODO: make sure that word repetition is not allowed
 def isGridWordLegit(position, grid, words, questions):
     row = position[0]
     col = position[1]
@@ -123,39 +131,37 @@ def isGridWordLegit(position, grid, words, questions):
             wordFromGrid += grid[row][col+i]
             i += 1
 
-        #print(wordFromGrid)
     else:
         i = 0
         while (row + i < len(grid)) and (grid[row + i][col] != "0") and (grid[row + i][col] not in questions):
             wordFromGrid += grid[row + i][col]
             i += 1
 
-        #print(wordFromGrid)
-
     for wordPair in words:
         if wordFromGrid == wordPair[0]:
-            #print("word is legit")
             return True
 
     return False
 
+#Checks if the grid consists only words from the list
+#Before calling it has to be sure that the grid is full!
 def isGridLegit(grid, words, questions):
     for row in range(len(grid)):
         for col in range(len(grid[0])):
-            #We found a question position
             if grid [row][col] in questions:
-                #check horizontal word if there is one
+                #We found a question position     
                 if (col + 1 < len(grid[0])) and (grid[row][col + 1] != "0") and (grid[row][col+1] not in questions):
+                    #check horizontal word if there is one
                     tmpPosition=[row, col+1, "across"]
                     if not isGridWordLegit(tmpPosition, grid, words, questions):
                         return False
-                #check vertical word
                 if (row + 1 < len(grid)) and (grid[row + 1][col] != "0") and (grid[row + 1][col] not in questions):
+                    #check vertical word
                     tmpPosition=[row+1, col, "down"]
                     if not isGridWordLegit(tmpPosition, grid, words, questions):
                         return False
-    print("Grid is legit")
-    printGame(grid, questions)
+    print("Grid is legit, returning")
+    #printGame(grid, questions)
     return True
 
 def crossword(words, grid, questions, staticWords):
@@ -165,8 +171,6 @@ def crossword(words, grid, questions, staticWords):
             return True
 
     if not words:
-##        printGame(grid, questions)
-##        print("Words are empty")
         return False
 
     currentWordPair = words.pop(0)
@@ -217,7 +221,6 @@ def crossword(words, grid, questions, staticWords):
                     print("--------------------\n")
 
     words.insert(0, currentWordPair)
-##    print(f"{currentWordPair[0]} will return false") 
     return False
 
 
