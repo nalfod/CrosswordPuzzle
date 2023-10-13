@@ -1,6 +1,6 @@
 import copy
 
-def importWordsFromFile(inputFile):
+def importWordsAndQuestionsFromFile(inputFile):
     with open(inputFile, 'r') as file:
         lines = file.readlines()
 
@@ -15,6 +15,7 @@ def importWordsFromFile(inputFile):
 
     return output
 
+#TODO: Probably there is a built-in version of this, replace it later
 def bubbleSortWordLength(listOfWords):
     n = len(listOfWords)
 
@@ -28,116 +29,116 @@ def possiblePositions(currentWord, grid):
 
     wordLength = len(currentWord)
 
-    for row in range(len(grid)):
-        for col in range(len(grid[0])):
+    for currRow in range(len(grid)):
+        for currCol in range(len(grid[0])):
             #Only try to place if the first letter match or the place is empty
-            if grid[row][col] == currentWord[0] or grid[row][col] == ".":
-                if wordLength <= len(grid[0]) - col:
-                    listOfPossibleCoordinates.append([row, col, "across"])
+            if grid[currRow][currCol] == currentWord[0] or grid[currRow][currCol] == ".":
+                if wordLength <= len(grid[0]) - currCol:
+                    listOfPossibleCoordinates.append([currRow, currCol, "across"])
 
-                if wordLength <= len(grid) - row:
-                    listOfPossibleCoordinates.append([row, col, "down"])
+                if wordLength <= len(grid) - currRow:
+                    listOfPossibleCoordinates.append([currRow, currCol, "down"])
 
     return listOfPossibleCoordinates
 
 def fits(currentWord, position, grid, questions):
     wordLength = len(currentWord)
-    row = position[0]
-    col = position[1]
+    row0 = position[0]
+    col0 = position[1]
     direction = position[2]
 
-    if row == 0 or col == 0:
+    if row0 == 0 or col0 == 0:
         return False
 
     if direction == "across":
-        if ( (grid[row][col-1] != ".") and (grid[row][col-1] not in questions) ):
+        if ( (grid[row0][col0-1] != ".") and (grid[row0][col0-1] not in questions) ):
             #If there is no place for the question before the word we return false
             return False
         else:
             for i in range(wordLength):
-                if grid[row][col + i] != "." and grid[row][col + i] != currentWord[i]:
+                if grid[row0][col0 + i] != "." and grid[row0][col0 + i] != currentWord[i]:
                     return False
-            if col + wordLength < len(grid[0]):
-                if (grid[row][col+wordLength] != ".") and (grid[row][col+wordLength] not in questions):
+            if col0 + wordLength < len(grid[0]):
+                if (grid[row0][col0+wordLength] != ".") and (grid[row0][col0+wordLength] not in questions):
                     #The word cannot end into another word, it has to be the border or a question box
                     return False
     else:
-        if ( (grid[row-1][col] != ".") and (grid[row-1][col] not in questions) ):
+        if ( (grid[row0-1][col0] != ".") and (grid[row0-1][col0] not in questions) ):
             #If there is no place for the question before the word we return false
             return False
         else:
             for i in range(wordLength):
-                if grid[row + i][col] != "." and grid[row + i][col] != currentWord[i]:
+                if grid[row0 + i][col0] != "." and grid[row0 + i][col0] != currentWord[i]:
                     return False
-            if row + wordLength < len(grid):
-                if (grid[row+wordLength][col] != ".") and (grid[row+wordLength][col] not in questions):
+            if row0 + wordLength < len(grid):
+                if (grid[row0+wordLength][col0] != ".") and (grid[row0+wordLength][col0] not in questions):
                     #The word cannot end into another word, it has to be the border or a question box
                     return False
 
     return True;
 
-def placeWord(currentWordAndQuestion, position, grid, questions):
-    currentWord = currentWordAndQuestion[0]
-    currentQuestion = currentWordAndQuestion[1]
+def placeWord(wordAndQuestionToPlace, position, grid, questions):
+    currentWord = wordAndQuestionToPlace[0]
+    currentQuestion = wordAndQuestionToPlace[1]
     
     wordLength = len(currentWord)
     
-    row = position[0]
-    col = position[1]
+    row0 = position[0]
+    col0 = position[1]
     direction = position[2]
 
     if direction == "across":
         for i in range(wordLength):
-            grid[row][col + i] = currentWord[i]
-        if grid[row][col - 1] == ".":
+            grid[row0][col0 + i] = currentWord[i]
+        if grid[row0][col0 - 1] == ".":
             #we have to create a new question box
             if not questions:
                 #if there is no question dict we have to make it
                 questions[1] = direction + ": " + currentQuestion
-                grid[row][col - 1] = 1
+                grid[row0][col0 - 1] = 1
             else:
                 questions[max(questions)+1] = direction + ": " + currentQuestion
-                grid[row][col - 1] = max(questions)
+                grid[row0][col0 - 1] = max(questions)
         else:
             #we extend the existing question box
-            questions[grid[row][col - 1]] += "\t" + direction + ": " + currentQuestion
+            questions[grid[row0][col0 - 1]] += "\t" + direction + ": " + currentQuestion
     else:
         for i in range(wordLength):
-            grid[row + i][col] = currentWord[i]
-        if grid[row - 1][col] == ".":
+            grid[row0 + i][col0] = currentWord[i]
+        if grid[row0 - 1][col0] == ".":
             #we have to create a new question box
             if not questions:
                 #if there is no question dict we have to make it
                 questions[1] = direction + ": " + currentQuestion
-                grid[row - 1][col] = 1
+                grid[row0 - 1][col0] = 1
             else:
                 questions[max(questions)+1] = direction + ": " + currentQuestion
-                grid[row - 1][col] = max(questions)
+                grid[row0 - 1][col0] = max(questions)
         else:
             #we extend the existing question box
-            questions[grid[row - 1][col]] += "\t" + direction + ": " + currentQuestion
+            questions[grid[row0 - 1][col0]] += "\t" + direction + ": " + currentQuestion
 
 #Checks that a word which is already on the grid is truly in the list of words
 #TODO: make sure that word repetition is not allowed
-def isGridWordLegit(position, grid, words, questions):
-    row = position[0]
-    col = position[1]
+def isGridWordLegit(position, grid, refWordQuestionPairList, questions):
+    row0 = position[0]
+    col0 = position[1]
     direction = position[2]
 
     wordFromGrid = ""
     if direction == "across":
         i = 0
-        while (col + i < len(grid[0])) and (grid[row][col + i] != "0") and (grid[row][col+i] not in questions):
-            wordFromGrid += grid[row][col+i]
+        while (col0 + i < len(grid[0])) and (grid[row0][col0 + i] != "0") and (grid[row0][col0+i] not in questions):
+            wordFromGrid += grid[row0][col0+i]
             i += 1
 
     else:
         i = 0
-        while (row + i < len(grid)) and (grid[row + i][col] != "0") and (grid[row + i][col] not in questions):
-            wordFromGrid += grid[row + i][col]
+        while (row0 + i < len(grid)) and (grid[row0 + i][col0] != "0") and (grid[row0 + i][col0] not in questions):
+            wordFromGrid += grid[row0 + i][col0]
             i += 1
 
-    for wordPair in words:
+    for wordPair in refWordQuestionPairList:
         if wordFromGrid == wordPair[0]:
             return True
 
@@ -145,46 +146,46 @@ def isGridWordLegit(position, grid, words, questions):
 
 #Checks if the grid consists only words from the list
 #Before calling it has to be sure that the grid is full!
-def isGridLegit(grid, words, questions):
-    for row in range(len(grid)):
-        for col in range(len(grid[0])):
-            if grid [row][col] in questions:
+def isGridLegit(grid, refWordQuestionPairList, questions):
+    for currRow in range(len(grid)):
+        for currCol in range(len(grid[0])):
+            if grid [currRow][currCol] in questions:
                 #We found a question position     
-                if (col + 1 < len(grid[0])) and (grid[row][col + 1] != "0") and (grid[row][col+1] not in questions):
+                if (currCol + 1 < len(grid[0])) and (grid[currRow][currCol + 1] != "0") and (grid[currRow][currCol+1] not in questions):
                     #check horizontal word if there is one
-                    tmpPosition=[row, col+1, "across"]
-                    if not isGridWordLegit(tmpPosition, grid, words, questions):
+                    tmpPosition=[currRow, currCol+1, "across"]
+                    if not isGridWordLegit(tmpPosition, grid, refWordQuestionPairList, questions):
                         return False
-                if (row + 1 < len(grid)) and (grid[row + 1][col] != "0") and (grid[row + 1][col] not in questions):
+                if (currRow + 1 < len(grid)) and (grid[currRow + 1][currCol] != "0") and (grid[currRow + 1][currCol] not in questions):
                     #check vertical word
-                    tmpPosition=[row+1, col, "down"]
-                    if not isGridWordLegit(tmpPosition, grid, words, questions):
+                    tmpPosition=[currRow+1, currCol, "down"]
+                    if not isGridWordLegit(tmpPosition, grid, refWordQuestionPairList, questions):
                         return False
     print("Grid is legit, returning")
     #printGame(grid, questions)
     return True
 
-def crossword(words, grid, questions, staticWords):
+def crossword(dynWordQuestionPairList, grid, questions, refWordQuestionPairList):
     if countEmptyFields(grid) == 0:
         print("All fields are full")
-        if isGridLegit(grid, staticWords, questions):
+        if isGridLegit(grid, refWordQuestionPairList, questions):
             return True
         else:
             return False
 
-    if not words:
+    if not dynWordQuestionPairList:
         return False
 
-    currentWordPair = words.pop(0)
-    currentWord = currentWordPair[0]
+    currentWordQuestionPair = dynWordQuestionPairList.pop(0)
+    currentWord = currentWordQuestionPair[0]
     for pos in possiblePositions(currentWord, grid): 
         if fits(currentWord, pos, grid, questions):
             #Making deepcopy snapshots for the backtracking
             gridSnapshot = copy.deepcopy(grid)
             questionsSnapshot = copy.deepcopy(questions)
             
-            placeWord(currentWordPair, pos, grid, questions)
-            if crossword(words, grid, questions, staticWords):
+            placeWord(currentWordQuestionPair, pos, grid, questions)
+            if crossword(dynWordQuestionPairList, grid, questions, refWordQuestionPairList):
                 return True
             else:
                 #Restoring the grid, since prev position did not lead to a solution   
@@ -193,15 +194,15 @@ def crossword(words, grid, questions, staticWords):
                 questions.update(questionsSnapshot)
 
     #lets put back current word, beacuse we are going up one level
-    words.insert(0, currentWordPair)
+    dynWordQuestionPairList.insert(0, currentWordQuestionPair)
     return False
 
 
 def printGame(grid, questions):
     tmpRow = ""
-    for row in range(len(grid)):
-        for col in range(len(grid[0])):
-            tmpRow += str(grid[row][col]) + "\t"
+    for currRow in range(len(grid)):
+        for currCol in range(len(grid[0])):
+            tmpRow += str(grid[currRow][currCol]) + "\t"
         print(tmpRow)
         tmpRow = ""
     
@@ -211,9 +212,9 @@ def printGame(grid, questions):
     
 def countEmptyFields(grid):
     emptyFields = 0
-    for row in range(len(grid)):
-        for col in range(len(grid[0])):
-            if grid[row][col] == ".":
+    for currRow in range(len(grid)):
+        for currCol in range(len(grid[0])):
+            if grid[currRow][currCol] == ".":
                 emptyFields += 1
     return emptyFields
 
@@ -229,26 +230,20 @@ def main():
         ["0","K","O","R","H","A","X","K","A","L","Y"]
     ]
 
-    grid2 = [
-        ["0","0","0","0","0",".",".",".",".",".","0"],
-        ["0","0","0","0","0","S","A","R","G","A","H"],
-        ["0","0","0","0",".","A","T",".","A",".","A"],
-        ["0","0","0","0",".","L","A","C",".","A","S"],
-        ["0","0",".",".","E","T",".","I","F",".","U"],
-        [".","C","A","E","N",".","E","B","E","N","."],
-        [".","Q",".","A","Y","A",".","A",".","A","C"],
-        ["0","K","O","R","H","A","X","K","A","L","Y"]
-    ]
     questions = dict()
+    print("The initial grid and questions: ")
     printGame(grid, questions)
 
-    dynamicWords = importWordsFromFile("input.txt")
-    bubbleSortWordLength(dynamicWords)
+    dynWordQuestionPairList = importWordsAndQuestionsFromFile("input.txt")
+    bubbleSortWordLength(dynWordQuestionPairList)
 
     #Is used later to check if all words on the grid exists in the input list
-    staticWords = copy.deepcopy(dynamicWords)
+    refWordQuestionPairList = copy.deepcopy(dynWordQuestionPairList)
     
-    print(crossword(dynamicWords, grid, questions, staticWords))
-    printGame(grid, questions)
+    if crossword(dynWordQuestionPairList, grid, questions, refWordQuestionPairList):
+        print("\nThe final grid and questions: ")
+        printGame(grid, questions)
+    else:
+        print("No solution found, maybe more words have to be added...")
 
 main()
