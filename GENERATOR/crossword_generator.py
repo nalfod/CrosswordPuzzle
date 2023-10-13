@@ -30,18 +30,13 @@ def possiblePositions(currentWord, grid):
 
     for row in range(len(grid)):
         for col in range(len(grid[0])):
-            if grid[row][col] == "0":
-                continue
-            if grid[row][col] != currentWord[0] and grid[row][col] != ".":
-                continue
+            #Only try to place if the first letter match or the place is empty
+            if grid[row][col] == currentWord[0] or grid[row][col] == ".":
+                if wordLength <= len(grid[0]) - col:
+                    listOfPossibleCoordinates.append([row, col, "across"])
 
-            if wordLength <= len(grid[0]) - col:
-                tmpList = [row, col, "across"]
-                listOfPossibleCoordinates.append(tmpList)
-
-            if wordLength <= len(grid) - row:
-                tmpList = [row, col, "down"]
-                listOfPossibleCoordinates.append(tmpList)
+                if wordLength <= len(grid) - row:
+                    listOfPossibleCoordinates.append([row, col, "down"])
 
     return listOfPossibleCoordinates
 
