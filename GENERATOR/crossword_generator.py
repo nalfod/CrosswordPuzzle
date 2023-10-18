@@ -1,4 +1,5 @@
 import copy
+from inspect import isawaitable
 
 def importWordsAndQuestionsFromFile(inputFile):
     with open(inputFile, 'r') as file:
@@ -41,6 +42,9 @@ def possiblePositions(currentWord, grid):
 
     return listOfPossibleCoordinates
 
+#TODO: if one word was completly overlay another word, ignore that. The initial mechanism is there
+#(by bool isWordAlreadyOnBoard) but it is not considering if the letters of the word is already there (eg.: one letter only)
+#but the question is not there on the grid yet --> think about this, is this mechanism needed??
 def fits(currentWord, position, grid, questions):
     wordLength = len(currentWord)
     row0 = position[0]
@@ -49,6 +53,8 @@ def fits(currentWord, position, grid, questions):
 
     if row0 == 0 or col0 == 0:
         return False
+    
+    isWordAlreadyOnBoard = True
 
     if direction == "across":
         if ( (grid[row0][col0-1] != ".") and (grid[row0][col0-1] not in questions) ):
@@ -56,6 +62,8 @@ def fits(currentWord, position, grid, questions):
             return False
         else:
             for i in range(wordLength):
+                if grid[row0][col0 + i] == ".":
+                    isWordAlreadyOnBoard = False
                 if grid[row0][col0 + i] != "." and grid[row0][col0 + i] != currentWord[i]:
                     return False
             if col0 + wordLength < len(grid[0]):
@@ -68,6 +76,8 @@ def fits(currentWord, position, grid, questions):
             return False
         else:
             for i in range(wordLength):
+                if grid[row0 + i][col0] == ".":
+                    isWordAlreadyOnBoard = False
                 if grid[row0 + i][col0] != "." and grid[row0 + i][col0] != currentWord[i]:
                     return False
             if row0 + wordLength < len(grid):
@@ -75,7 +85,10 @@ def fits(currentWord, position, grid, questions):
                     #The word cannot end into another word, it has to be the border or a question box
                     return False
 
-    return True;
+    if isWordAlreadyOnBoard:
+        return True
+    else:
+        return True
 
 def placeWord(wordAndQuestionToPlace, position, grid, questions):
     currentWord = wordAndQuestionToPlace[0]
@@ -141,7 +154,9 @@ def isGridWordLegit(position, grid, refWordQuestionPairList, questions):
     for wordPair in refWordQuestionPairList:
         if wordFromGrid == wordPair[0]:
             return True
+        
 
+    print(f"The following grid word is not in the word list: {wordFromGrid}")
     return False
 
 #Checks if the grid consists only words from the list
@@ -166,14 +181,21 @@ def isGridLegit(grid, refWordQuestionPairList, questions):
     return True
 
 def crossword(dynWordQuestionPairList, grid, questions, refWordQuestionPairList):
+    #print("--------------------")
+    #printGrid(grid)
     if countEmptyFields(grid) == 0:
         print("All fields are full")
         if isGridLegit(grid, refWordQuestionPairList, questions):
             return True
         else:
             return False
+        
+    # if countEmptyFields(grid) < 3:
+    #     printGrid(grid)
+    #     print(dynWordQuestionPairList)
 
     if not dynWordQuestionPairList:
+        # print("All of the words has been used, still no solution has been found....")
         return False
 
     currentWordQuestionPair = dynWordQuestionPairList.pop(0)
@@ -193,18 +215,28 @@ def crossword(dynWordQuestionPairList, grid, questions, refWordQuestionPairList)
                 questions.clear()
                 questions.update(questionsSnapshot)
 
-    #lets put back current word, beacuse we are going up one level
-    dynWordQuestionPairList.insert(0, currentWordQuestionPair)
-    return False
+    
+    if crossword(dynWordQuestionPairList, grid, questions, refWordQuestionPairList):
+        return True
+    else:
+        #lets put back current word+question, beacuse we are going up one level
+        dynWordQuestionPairList.insert(0, currentWordQuestionPair)
+        # print("---------------------")
+        # print(f"I put back= {currentWord}")
+        # print(dynWordQuestionPairList)
+        # print("---------------------")
+        return False
 
-
-def printGame(grid, questions):
+def printGrid(grid):
     tmpRow = ""
     for currRow in range(len(grid)):
         for currCol in range(len(grid[0])):
             tmpRow += str(grid[currRow][currCol]) + "\t"
         print(tmpRow)
         tmpRow = ""
+
+def printGame(grid, questions):
+    printGrid(grid)
     
     print("\nQuestions:")
     for key, value in questions.items():
@@ -233,6 +265,7 @@ def main():
     questions = dict()
     print("The initial grid and questions: ")
     printGame(grid, questions)
+    print()
 
     dynWordQuestionPairList = importWordsAndQuestionsFromFile("input.txt")
     bubbleSortWordLength(dynWordQuestionPairList)

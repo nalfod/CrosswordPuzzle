@@ -24,3 +24,6 @@ GA	&	Gallium
 NAL	&	nal
 CY	&	ciprus autojel
 FE	&	Ferrium
+IYA	&	iya
+GI	&	Gizi eleje
+AY	&	ay nagybetuvel
